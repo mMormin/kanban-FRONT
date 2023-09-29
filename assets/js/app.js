@@ -50,6 +50,7 @@ var app = {
   makeDomCard: function (formData) {
     const template = document.getElementById("card");
     const cardsContainer = document.querySelector(".card-lists");
+    const input = app.form.querySelector("input");
 
     const clone = document.importNode(template.content, true);
     const title = clone.querySelector("h2");
@@ -57,6 +58,7 @@ var app = {
 
     cardsContainer.appendChild(clone);
     app.hideModal();
+    input.value = "";
   },
 };
 
