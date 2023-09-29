@@ -6,3 +6,7 @@ body {
 .card-lists {
   overflow-x: auto;
 }
+
+.panel-block {
+  min-height: 80px;
+}

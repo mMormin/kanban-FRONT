@@ -1,6 +1,7 @@
 var app = {
-  // Modal
+  // Global variables
   modal: document.getElementById("addListModal"),
+  form: document.getElementById("cardAdd"),
 
   // Init Function
   init: function () {
@@ -11,7 +12,6 @@ var app = {
   listeners: function () {
     const newCardButton = document.getElementById("addListButton");
     const closeModalButtons = document.querySelectorAll(".close");
-    const validFormButton = document.querySelector(".input");
 
     newCardButton.addEventListener("click", app.showModal);
 
@@ -19,7 +19,7 @@ var app = {
       closeModalButtons[i].addEventListener("click", app.hideModal);
     }
 
-    validFormButton.addEventListener("submit", app.hundleFormSubmit);
+    app.form.addEventListener("submit", app.hundleFormSubmit);
   },
 
   // Show modal Function
@@ -36,20 +36,28 @@ var app = {
   hundleFormSubmit: function (e) {
     e.preventDefault();
 
-    const formData = new FormData(form);
+    const formData = new FormData(app.form);
 
-    for (let data of formData) {
-      let name = data[0];
-      let value = data[1];
-
-      formData.append(name, value);
+    if (!formData.get("name")) {
+      alert("Impossible de créer une carte sans nom !")
+      return;
     }
 
     app.makeDomCard(formData);
   },
 
   // Make a card in the DOM Function
-  makeDomCard: function () {},
+  makeDomCard: function (formData) {
+    const template = document.getElementById("card");
+    const cardsContainer = document.querySelector(".card-lists");
+
+    const clone = document.importNode(template.content, true);
+    const title = clone.querySelector("h2");
+    title.textContent = formData.get("name");
+
+    cardsContainer.appendChild(clone);
+    app.hideModal();
+  },
 };
 
 document.addEventListener("DOMContentLoaded", app.init);
