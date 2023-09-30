@@ -25,7 +25,7 @@
             <span class="icon is-small">
               <i class="fas fa-plus"></i>
             </span>
-            &nbsp; Ajouter une liste
+            &nbsp; Ajouter une carte
           </button>
         </div>
 
@@ -33,7 +33,7 @@
           <div class="column is-full">
             <div class="cards-list columns">
               <!-- list -->
-              <div class="column is-one-quarter panel" data-list-id="A">
+              <div class="column is-one-quarter panel" data-card-id="A">
                 <div class="panel-heading has-background-info">
                   <div class="columns">
                     <div class="column">
@@ -94,7 +94,7 @@
               <!--/ list -->
 
               <!-- list -->
-              <div class="column is-one-quarter panel" data-list-id="B">
+              <div class="column is-one-quarter panel" data-card-id="B">
                 <div class="panel-heading has-background-info">
                   <div class="columns">
                     <div class="column">
@@ -219,12 +219,14 @@
       </div>
     </section>
 
+
+    <!-- Card Modal -->
     <div class="modal" id="addCardModal">
       <div class="modal-background"></div>
       <div class="modal-card">
         <form id="cardAdd" action="" method="POST">
           <header class="modal-card-head">
-            <p class="modal-card-title">Ajouter une liste</p>
+            <p class="modal-card-title">Ajouter une Carte</p>
             <button
               class="delete close"
               type="button"
@@ -239,7 +241,7 @@
                   type="text"
                   class="input"
                   id="cardInput"
-                  name="name"
+                  name="input_value"
                   value=""
                   placeholder="Nom de la liste"
                 />
@@ -254,10 +256,11 @@
       </div>
     </div>
 
+    <!-- Todo Modal -->
     <div class="modal" id="addTodoModal">
       <div class="modal-background"></div>
       <div class="modal-card">
-        <form id="cardAdd" action="" method="POST">
+        <form id="todoAdd" action="" method="POST">
           <header class="modal-card-head">
             <p class="modal-card-title">Ajouter une todo</p>
             <button
@@ -274,13 +277,13 @@
                   type="text"
                   class="input"
                   id="todoInput"
-                  name="name"
+                  name="input_value"
                   value=""
-                  placeholder="Nom de la todo"
+                  placeholder="Nom de la tâche"
                 />
-                <input type="hidden" name="todo_id" />
               </div>
             </div>
+            <input id="todoId" type="hidden" name="id" value="" />
           </section>
           <footer class="modal-card-foot">
             <button class="button is-success">Save changes</button>
@@ -292,7 +295,7 @@
 
     <!-- Card Template -->
     <template id="card">
-      <div class="column is-one-quarter panel" data-list-id="A">
+      <div class="column is-one-quarter panel" data-card-id="test">
         <div class="panel-heading has-background-info">
           <div class="columns">
             <div class="column">
@@ -304,12 +307,13 @@
                   <div class="control">
                     <input
                       type="text"
+                      id="list-id"
                       class="input is-small"
                       name="list-name"
                       value=""
                       placeholder="Nom de la liste"
                       required
-                    />cards-list
+                    />
                   </div>
                   <div class="control">
                     <button class="button is-small is-success">Valider</button>
@@ -329,7 +333,7 @@
         </div>
         <div class="panel-block todos-list is-block has-background-light">
           <!-- card -->
-          <!-- <div class="box" data-card-id="J">
+          <div class="box" data-card-id="J">
             <div class="columns">
               <div class="column">Nouvelle tâche</div>
               <div class="column is-narrow">
@@ -345,7 +349,7 @@
                 </a>
               </div>
             </div>
-          </div> -->
+          </div>
           <!--/ card -->
         </div>
       </div>
@@ -355,7 +359,7 @@
     <template id="todo">
       <div class="box" data-card-id="J">
         <div class="columns">
-          <div class="column">Réviser le front</div>
+          <div class="column todo__title">Réviser le front</div>
           <div class="column is-narrow">
             <a href="#">
               <span class="icon is-small has-text-primary">

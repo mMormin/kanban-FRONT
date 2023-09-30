@@ -5,103 +5,121 @@ var app = {
   cardForm: document.getElementById("cardAdd"),
   todoForm: document.getElementById("todoAdd"),
 
-  // Init Function
+  // Executed functions after initialization
   init: function () {
-    const input = app.form.querySelector("input");
-    app.listeners();
-    input.value = "Nouvelle carte";
-  },
-
-  // Events listener Function
-  listeners: function () {
     const newCardButton = document.getElementById("addCardButton");
-    const newTodoButton = document.getElementById("addTodoButton");
     const closeModalButtons = document.querySelectorAll(".close");
 
-    newCardButton.addEventListener("click", app.cardModalShow);
-    for (let i = 0; i < closeModalButtons.length; i++) {
-      closeModalButtons[i].addEventListener("click", app.hideModal);
-    }
+    // Globals events listeners
+    newCardButton.addEventListener("click", app.showModalCard);
+    closeModalButtons.forEach((button) => {
+      button.addEventListener("click", app.hideModal);
+    });
+    app.todoForm.addEventListener("submit", app.handleNewTodo);
+    app.cardForm.addEventListener("submit", app.handleNewCard);
 
-    newTodoButton.addEventListener("click", app.todoModalShow);
-
-    app.cardForm.addEventListener("submit", app.hundleCardSubmit);
-    app.todoForm.addEventListener("submit", app.hundleTodoSubmit);
+    // Reset inputs function call
+    app.resetInputs();
   },
 
-  // Show card modal Function
-  cardModalShow: function () {
+  // Resets all modals inputs values by the placeholders
+  resetInputs: function () {
+    const cardInput = app.cardForm.querySelector("input");
+    const todoInput = app.todoForm.querySelector("input");
+    cardInput.value = cardInput.placeholder;
+    todoInput.value = todoInput.placeholder;
+  },
+
+  // Show Card modal
+  showModalCard: function () {
     app.cardModal.classList.add("is-active");
   },
 
-  // Show todo modal Function
-  todoModalShow: function () {
+  // Show Todo modal
+  showModalTodo: function (e) {
+    const idInput = document.getElementById("todoId");
+
+    // data-card-id's value of HTML .panel element
+    const cardId = e.target.closest(".panel").dataset.cardId;
+
+    idInput.value = cardId;
+
     app.todoModal.classList.add("is-active");
   },
 
-  // Hide card modal Function
-  modalHide: function () {
-    const modal = document.querySelector(".modal");
-    modal.classList.remove("is-active");
+  // Hide all opened modal
+  hideModal: function () {
+    const modals = document.querySelectorAll(".modal");
+
+    modals.forEach((modal) => {
+      modal.classList.remove("is-active");
+    });
   },
 
-  // Hundle form submission Function
-  hundleCardSubmit: function (e) {
+  // Getting the new card form's data on submission
+  handleNewCard: function (e) {
     e.preventDefault();
 
-    const formData = new FormData(app.cardForm);
+    const formData = Object.fromEntries(new FormData(app.cardForm));
+    const { input_value } = formData;
 
-    if (!formData.get("name")) {
+    if (!input_value) {
       alert("Impossible de créer une carte sans nom !");
       return;
     }
 
-    app.makeCard(formData);
+    app.makeCard(input_value);
   },
 
-  hundleTodoSubmit: function (e) {
+  // Getting the new todo form's datas on submission
+  handleNewTodo: function (e) {
     e.preventDefault();
 
-    const formData = new FormData(app.todoForm);
+    const formData = Object.fromEntries(new FormData(app.todoForm));
+    const { input_value, id } = formData;
 
-    if (!formData.get("name")) {
-      alert("Impossible de créer une carte sans nom !");
+    if (!input_value) {
+      alert("Impossible de créer une todo sans nom !");
       return;
+    } else if (!id) {
+      throw new Error("Cannot get the card_id");
     }
 
-    app.makeTodo(formData);
+    app.makeTodo(input_value, id);
   },
 
-  // Make a card in the DOM Function
-  makeCard: function (formData) {
+  // Creating and adding the card to the DOM
+  makeCard: function (inputValue) {
     const template = document.getElementById("card");
-    const cardsContainer = document.querySelector(".cards-lists");
-    const input = app.form.querySelector("input");
-
-    // Card clone append
+    const cardsContainer = document.querySelector(".cards-list");
     const clone = document.importNode(template.content, true);
+
+    clone
+      .getElementById("addTodoButton")
+      .addEventListener("click", app.showModalTodo);
+
     const title = clone.querySelector("h2");
-    title.textContent = formData.get("name");
+    title.textContent = inputValue;
 
     cardsContainer.appendChild(clone);
     app.hideModal();
-    input.value = "Nouvelle carte";
+    app.resetInputs();
   },
 
-  // Make a todo in the DOM Function
-  makeTodo: function () {
+  // Creating and adding the todo to the DOM
+  makeTodo: function (inputValue, cardId) {
     const template = document.getElementById("todo");
-    const todosContainer = document.querySelector(".todos-list");
-    const input = app.form.querySelector("input");
+    const todosContainer = document.querySelector(
+      `[data-list-id="${cardId}"] .todos-list`
+    );
 
-    // Todo clone append
     const clone = document.importNode(template.content, true);
-    const title = clone.querySelector("h2");
-    title.textContent = formData.get("name");
+    const title = clone.querySelector(".todo__title");
+    title.textContent = inputValue;
 
     todosContainer.appendChild(clone);
     app.hideModal();
-    input.value = "Nouveau todo";
+    app.resetInputs();
   },
 };
 
