@@ -1,64 +1,107 @@
 var app = {
   // Global variables
-  modal: document.getElementById("addListModal"),
-  form: document.getElementById("cardAdd"),
+  cardModal: document.getElementById("addCardModal"),
+  todoModal: document.getElementById("addTodoModal"),
+  cardForm: document.getElementById("cardAdd"),
+  todoForm: document.getElementById("todoAdd"),
 
   // Init Function
   init: function () {
+    const input = app.form.querySelector("input");
     app.listeners();
+    input.value = "Nouvelle carte";
   },
 
   // Events listener Function
   listeners: function () {
-    const newCardButton = document.getElementById("addListButton");
+    const newCardButton = document.getElementById("addCardButton");
+    const newTodoButton = document.getElementById("addTodoButton");
     const closeModalButtons = document.querySelectorAll(".close");
 
-    newCardButton.addEventListener("click", app.showModal);
-
+    newCardButton.addEventListener("click", app.cardModalShow);
     for (let i = 0; i < closeModalButtons.length; i++) {
       closeModalButtons[i].addEventListener("click", app.hideModal);
     }
 
-    app.form.addEventListener("submit", app.hundleFormSubmit);
+    newTodoButton.addEventListener("click", app.todoModalShow);
+
+    app.cardForm.addEventListener("submit", app.hundleCardSubmit);
+    app.todoForm.addEventListener("submit", app.hundleTodoSubmit);
   },
 
-  // Show modal Function
-  showModal: function () {
-    app.modal.classList.add("is-active");
+  // Show card modal Function
+  cardModalShow: function () {
+    app.cardModal.classList.add("is-active");
   },
 
-  // Hide modal Function
-  hideModal: function () {
-    app.modal.classList.remove("is-active");
+  // Show todo modal Function
+  todoModalShow: function () {
+    app.todoModal.classList.add("is-active");
+  },
+
+  // Hide card modal Function
+  modalHide: function () {
+    const modal = document.querySelector(".modal");
+    modal.classList.remove("is-active");
   },
 
   // Hundle form submission Function
-  hundleFormSubmit: function (e) {
+  hundleCardSubmit: function (e) {
     e.preventDefault();
 
-    const formData = new FormData(app.form);
+    const formData = new FormData(app.cardForm);
 
     if (!formData.get("name")) {
-      alert("Impossible de créer une carte sans nom !")
+      alert("Impossible de créer une carte sans nom !");
       return;
     }
 
-    app.makeDomCard(formData);
+    app.makeCard(formData);
+  },
+
+  hundleTodoSubmit: function (e) {
+    e.preventDefault();
+
+    const formData = new FormData(app.todoForm);
+
+    if (!formData.get("name")) {
+      alert("Impossible de créer une carte sans nom !");
+      return;
+    }
+
+    app.makeTodo(formData);
   },
 
   // Make a card in the DOM Function
-  makeDomCard: function (formData) {
+  makeCard: function (formData) {
     const template = document.getElementById("card");
-    const cardsContainer = document.querySelector(".card-lists");
+    const cardsContainer = document.querySelector(".cards-lists");
     const input = app.form.querySelector("input");
 
+    // Card clone append
     const clone = document.importNode(template.content, true);
     const title = clone.querySelector("h2");
     title.textContent = formData.get("name");
 
     cardsContainer.appendChild(clone);
     app.hideModal();
-    input.value = "";
+    input.value = "Nouvelle carte";
+  },
+
+  // Make a todo in the DOM Function
+  makeTodo: function () {
+    const template = document.getElementById("todo");
+    const todosContainer = document.querySelector(".todos-list");
+    const input = app.form.querySelector("input");
+
+    // Todo clone append
+    const clone = document.importNode(template.content, true);
+    const title = clone.querySelector("h2");
+    title.textContent = formData.get("name");
+
+    todosContainer.appendChild(clone);
+    app.hideModal();
+    input.value = "Nouveau todo";
   },
 };
 
