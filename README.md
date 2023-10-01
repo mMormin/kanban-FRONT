@@ -1,11 +1,11 @@
 # oKanban Front 🎨
+1️⃣____ &nbsp;&nbsp; **[m a s t e r](https://github.com/O-clock-Cheesecake/oKanban-front-mMormin/tree/master)**
 
-
-🖥️  **[m a s t e r](https://github.com/O-clock-Cheesecake/oKanban-front-mMormin/tree/master)**
+📝 **[Challenge JOUR 1](https://github.com/O-clock-Cheesecake/oKanban-front-mMormin/blob/makeModal/README.md)**
 
 </br>
 
-## Features
+## Features Branchs
 🔳 **[makeModal](https://github.com/O-clock-Cheesecake/oKanban-front-mMormin/tree/makeModal)**
 
   ❔ *All modals datas as one HTML template filled thought makeModal function*
