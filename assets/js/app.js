@@ -92,8 +92,6 @@ var app = {
 
     const form = e.target;
 
-    console.log(form);
-
     const formData = Object.fromEntries(new FormData(form));
     const { input_value, id } = formData;
 
