@@ -1,25 +1,93 @@
 var app = {
   // Global variables
-  cardModal: document.getElementById("addCardModal"),
-  todoModal: document.getElementById("addTodoModal"),
+  modal: document.querySelector(".modal"),
   cardForm: document.getElementById("cardAdd"),
   todoForm: document.getElementById("todoAdd"),
 
   // Executed functions after initialization
   init: function () {
     const newCardButton = document.getElementById("addCardButton");
-    const closeModalButtons = document.querySelectorAll(".close");
+
 
     // Globals events listeners
-    newCardButton.addEventListener("click", app.showModalCard);
+    newCardButton.addEventListener("click", app.makeModal);
+
+
+  },
+
+  makeModal: function (e) {
+    const { id } = e.target;
+    const template = document.getElementById("modal");
+    const section = document.querySelector(".section");
+    const clone = document.importNode(template.content, true);
+    
+    // Clone Variables
+    const title = clone.querySelector(".modal-card-title");
+    const form = clone.querySelector("form");
+    const label = clone.querySelector(".label");
+    const input = clone.querySelector(".input");
+    const modal = clone.querySelector(".modal");
+
+    // Clone Strings
+    let modalId = "";
+    let formValue = "Add";
+    let titleValue = "Ajouter une ";
+    let placeholderValue = "Nom de la nouvelle ";
+    let idValue = "Input";
+
+    // Clone Seeding
+    if (id === "addCardButton") {
+      const nameEn = "card";
+      const nameFr = "carte";
+      
+      modalId = "addCardModal";
+      titleValue = titleValue + nameFr;
+      formValue = nameEn + formValue;
+      idValue = nameEn + idValue;
+      placeholderValue = placeholderValue + nameFr;
+
+      form.addEventListener("submit", app.handleNewCard);
+
+    } else {
+      const nameEn = "todo";
+      const nameFr = "tâche";
+      const idInput = document.getElementById("todoId");
+      const cardId = e.target.closest(".panel").dataset.cardId;
+      
+      modalId = "addTodoModal";
+      titleValue = titleValue + nameFr;
+      formValue = nameEn + formValue;
+      idValue = nameEn + idValue;
+      placeholderValue = placeholderValue + nameFr;;
+
+      // data-card-id's value of HTML .panel element
+      idInput.value = cardId;
+
+      form.addEventListener("submit", app.handleNewTodo);
+    }
+
+    // Seeding
+    modal.setAttribute("id", modalId);
+    form.setAttribute("id", formValue);
+    title.textContent = titleValue;
+    label.setAttribute("for", idValue);
+    input.setAttribute("id", idValue);
+    input.setAttribute("placeholder", placeholderValue);
+
+    // Show modal
+    modal.classList.add("is-active");
+
+    // Append modal after section div
+    section.parentNode.insertBefore(clone, section.nextSibling);
+
+    const closeModalButtons = document.querySelectorAll(".close");
+
     closeModalButtons.forEach((button) => {
       button.addEventListener("click", app.hideModal);
     });
-    app.todoForm.addEventListener("submit", app.handleNewTodo);
-    app.cardForm.addEventListener("submit", app.handleNewCard);
 
-    // Reset inputs function call
-    app.resetInputs();
+    //section.appendChild(clone);
+    //app.showModal();
   },
 
   // Resets all modals inputs values by the placeholders
@@ -31,20 +99,8 @@ var app = {
   },
 
   // Show Card modal
-  showModalCard: function () {
-    app.cardModal.classList.add("is-active");
-  },
-
-  // Show Todo modal
-  showModalTodo: function (e) {
-    const idInput = document.getElementById("todoId");
-
-    // data-card-id's value of HTML .panel element
-    const cardId = e.target.closest(".panel").dataset.cardId;
-
-    idInput.value = cardId;
-
-    app.todoModal.classList.add("is-active");
+  showModal: function () {
+    app.modal.classList.add("is-active");
   },
 
   // Hide all opened modal
@@ -96,7 +152,7 @@ var app = {
 
     clone
       .getElementById("addTodoButton")
-      .addEventListener("click", app.showModalTodo);
+      .addEventListener("click", app.makeModal);
 
     const title = clone.querySelector("h2");
     title.textContent = inputValue;
