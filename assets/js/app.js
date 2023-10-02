@@ -1,4 +1,7 @@
 var app = {
+  base_url: "http://localhost:3000/boards/1/cards",
+  errorBox: document.querySelector(".error-box"),
+
   // Modal Strings
   modalConstants: {
     cardModalIdValue: "addCardModal",
@@ -11,11 +14,77 @@ var app = {
 
   // Executed functions after initialization
   init: function () {
+    app.getCardsList();
+
     const newCardButton = document.getElementById("addCardButton");
 
     newCardButton.addEventListener("click", app.makeCardModal);
   },
 
+  getCardsList: async function () {
+    try {
+      const response = await fetch(app.base_url);
+
+      if (!response.ok) throw json;
+
+      const json = await response.json();
+
+      json.forEach((card) => {
+
+        if(!card){
+          errorBox.classList.remove("is-hidden");
+        }
+
+        const cardsData = new FormData();
+        
+        for (const key in card) {
+          cardsData.append(key, card[key]);
+        }
+        
+        app.createCard(cardsData);
+        
+        card.todos.forEach((todo) => {
+          const todosData = new FormData();
+
+          for (const key in todo) {
+            todosData.append(key, todo[key]);
+          }
+
+          const cardId = todosData.get("card_id");
+
+          app.createTodo(todosData, cardId);
+        });
+
+
+      });
+    } catch (error) {
+      console.log(error);
+      return;
+    }
+  },
+
+  // Getting the new card form's data on submission
+  handleCards: function (e, isCard) {
+    e.preventDefault();
+
+    const form = e.target;
+
+    const formData = Object.fromEntries(new FormData(form));
+    const { input_value, id } = formData;
+
+    if (!input_value) {
+      alert(`Impossible de créer une ${isCard ? "carte" : "todo"} sans nom !`);
+      return;
+    }
+
+    if (isCard) {
+      app.createCard(input_value);
+    } else {
+      app.createTodo(input_value, id);
+    }
+  },
+
+  // Card Modal Initialization
   makeCardModal: function (e) {
     const nameEn = "card";
     const nameFr = "carte";
@@ -23,6 +92,7 @@ var app = {
     app.createModal(e, nameEn, nameFr, isCard);
   },
 
+  // Todo Modal Initialization
   makeTodoModal: function (e) {
     const nameEn = "todo";
     const nameFr = "tâche";
@@ -101,7 +171,7 @@ var app = {
     }
 
     if (isCard) {
-      app.createCard(input_value);
+      app.createCard(input_value, id);
     } else {
       app.createTodo(input_value, id);
     }
@@ -117,7 +187,7 @@ var app = {
   },
 
   // Creating and adding the card to the DOM
-  createCard: function (cardName) {
+  createCard: function (cardDatas) {
     const template = document.getElementById("card");
     const cardsContainer = document.querySelector(".cards-list");
     const clone = document.importNode(template.content, true);
@@ -127,14 +197,18 @@ var app = {
       .addEventListener("click", app.makeTodoModal);
 
     const title = clone.querySelector("h2");
-    title.textContent = cardName;
+    const cardId = clone.querySelector(".panel");
 
+    
+    cardId.dataset.cardId = cardDatas.get("id");
+    title.textContent = cardDatas.get("title");
+    
     cardsContainer.appendChild(clone);
     app.hideModal();
   },
-
+  
   // Creating and adding the todo to the DOM
-  createTodo: function (todoName, cardId) {
+  createTodo: function (todoDatas, cardId) {
     const template = document.getElementById("todo");
     const todosContainer = document.querySelector(
       `[data-card-id="${cardId}"] .todos-list`
@@ -142,7 +216,7 @@ var app = {
 
     const clone = document.importNode(template.content, true);
     const title = clone.querySelector(".todo__title");
-    title.textContent = todoName;
+    title.textContent = todoDatas.get("title");
 
     todosContainer.appendChild(clone);
     app.hideModal();
