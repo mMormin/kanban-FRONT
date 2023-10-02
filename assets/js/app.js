@@ -30,19 +30,18 @@ var app = {
       const json = await response.json();
 
       json.forEach((card) => {
-
-        if(!card){
+        if (!card) {
           errorBox.classList.remove("is-hidden");
         }
 
         const cardsData = new FormData();
-        
+
         for (const key in card) {
           cardsData.append(key, card[key]);
         }
-        
+
         app.createCard(cardsData);
-        
+
         card.todos.forEach((todo) => {
           const todosData = new FormData();
 
@@ -54,33 +53,10 @@ var app = {
 
           app.createTodo(todosData, cardId);
         });
-
-
       });
     } catch (error) {
       console.log(error);
       return;
-    }
-  },
-
-  // Getting the new card form's data on submission
-  handleCards: function (e, isCard) {
-    e.preventDefault();
-
-    const form = e.target;
-
-    const formData = Object.fromEntries(new FormData(form));
-    const { input_value, id } = formData;
-
-    if (!input_value) {
-      alert(`Impossible de créer une ${isCard ? "carte" : "todo"} sans nom !`);
-      return;
-    }
-
-    if (isCard) {
-      app.createCard(input_value);
-    } else {
-      app.createTodo(input_value, id);
     }
   },
 
@@ -157,23 +133,47 @@ var app = {
   },
 
   // Getting the new card form's data on submission
-  handleFormModalSubmission: function (e, isCard) {
+  handleFormModalSubmission: async function (e, isCard) {
     e.preventDefault();
 
-    const form = e.target;
+    try {
+      const form = e.target;
 
-    const formData = Object.fromEntries(new FormData(form));
-    const { input_value, id } = formData;
+      const formData = new FormData(form);
+      const title = formData.get("title");
 
-    if (!input_value) {
-      alert(`Impossible de créer une ${isCard ? "carte" : "todo"} sans nom !`);
+      const options = {
+        method: "POST",
+        body: formData,
+      };
+
+      if (!title) {
+        alert(
+          `Impossible de créer une ${isCard ? "carte" : "todo"} sans nom !`
+        );
+        return;
+      }
+
+      if (isCard) {
+        const response = await fetch(app.base_url, options);
+
+        if (!response.ok) throw json;
+
+        const json = await response.json();
+        
+        location.reload();
+      } else {
+        const response = await fetch(app.base_url, options);
+
+        if (!response.ok) throw json;
+
+        const json = await response.json();
+
+        app.createTodo(formData, id);
+      }
+    } catch (error) {
+      console.log(error);
       return;
-    }
-
-    if (isCard) {
-      app.createCard(input_value, id);
-    } else {
-      app.createTodo(input_value, id);
     }
   },
 
@@ -199,14 +199,14 @@ var app = {
     const title = clone.querySelector("h2");
     const cardId = clone.querySelector(".panel");
 
-    
+
     cardId.dataset.cardId = cardDatas.get("id");
     title.textContent = cardDatas.get("title");
-    
+
     cardsContainer.appendChild(clone);
     app.hideModal();
   },
-  
+
   // Creating and adding the todo to the DOM
   createTodo: function (todoDatas, cardId) {
     const template = document.getElementById("todo");
