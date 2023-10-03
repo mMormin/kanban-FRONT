@@ -1,4 +1,4 @@
-var app = {
+const app = {
   base_url: "http://localhost:3000/boards/1/cards",
   errorBox: document.querySelector(".error-box"),
 
