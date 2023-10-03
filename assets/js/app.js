@@ -13,21 +13,22 @@ var app = {
 
   // Executed functions after initialization
   init: function () {
-    app.getData();
+    app.fetchAllFromApi();
 
     const isCard = true;
     const newCardButton = document.getElementById("addCardButton");
 
-    newCardButton.addEventListener("click", (e) => app.makeNewModal(e, isCard));
+    newCardButton.addEventListener("click", (e) => app.newModalAttributes(e, isCard));
   },
 
-  upperFirstLetter: function (value) {
+  // To get the first letter of the string uppercased
+  capzFirstLetter: function (value) {
     const upperIt = value.charAt(0).toUpperCase() + value.slice(1);
     return upperIt;
   },
 
   // Get all the cards and todos
-  getData: async function () {
+  fetchAllFromApi: async function () {
     try {
       const response = await fetch(app.base_url);
       const json = await response.json();
@@ -64,9 +65,9 @@ var app = {
     }
   },
 
-  // New Modal Definition
-  makeNewModal: function (e, isCard) {
-    let data = {
+  // New Modal Initialization
+  newModalAttributes: function (e, isCard) {
+    const data = {
       isCard,
       method: "add",
       formValue: "",
@@ -77,36 +78,16 @@ var app = {
       submitValue: "Créer",
     };
 
-    // Modal Data Definition
-    if (isCard === true) {
-      data.titleValue += app.modalConstants.sufixCardFr;
-      data.placeholderValue += app.modalConstants.sufixCardFr;
-      data.formValue =
-        app.modalConstants.cardNameEn + app.upperFirstLetter(data.method);
-      data.inputValue = data.method + app.modalConstants.inputSufix;
-      data.idValue =
-        data.method +
-        app.upperFirstLetter(app.modalConstants.cardNameEn) +
-        "Modal";
-    } else {
-      data.titleValue += app.modalConstants.sufixTodoFr;
-      data.placeholderValue += app.modalConstants.sufixTodoFr;
-      data.formValue =
-        app.modalConstants.todoNameEn + app.upperFirstLetter(data.method);
-      data.inputValue = data.method + app.modalConstants.inputSufix;
-      data.idValue =
-        data.method +
-        app.upperFirstLetter(app.modalConstants.todoNameEn) +
-        "Modal";
-    }
-
-    app.createModal(e, data);
+    app.fillModalWithAttributes(e, data);
   },
 
-  // EDIT Todo Modal Initialization
-  makeEditTodoModal: function (e, cardId, todoId) {
-    let data = {
-      isCard: false,
+  // Edit Modal Initialization
+  editModalAttributes: function (e, isCard, cardId, todoId) {
+
+    console.log(isCard)
+
+    const data = {
+      isCard,
       method: "edit",
       formValue: "",
       inputValue: "",
@@ -120,15 +101,35 @@ var app = {
       },
     };
 
-    data.titleValue += app.modalConstants.sufixTodoFr;
-    data.placeholderValue += app.modalConstants.sufixTodoFr;
-    data.formValue =
-      app.modalConstants.todoNameEn + app.upperFirstLetter(data.method);
-    data.inputValue = data.method + app.modalConstants.inputSufix;
-    data.idValue =
-      data.method +
-      app.upperFirstLetter(app.modalConstants.todoNameEn) +
-      "Modal";
+    console.log(data)
+
+    app.fillModalWithAttributes(e, data);
+  },
+
+  // Modals Data Definition
+  fillModalWithAttributes: function (e, data) {
+    if (data.isCard === true) {
+      data.titleValue += app.modalConstants.sufixCardFr;
+      data.placeholderValue += app.modalConstants.sufixCardFr;
+      data.formValue =
+        app.modalConstants.cardNameEn + app.capzFirstLetter(data.method);
+      data.inputValue = data.method + app.modalConstants.inputSufix;
+      data.idValue =
+        data.method +
+        app.capzFirstLetter(app.modalConstants.cardNameEn) +
+        "Modal";
+      } else {
+        data.titleValue += app.modalConstants.sufixTodoFr;
+        data.placeholderValue += app.modalConstants.sufixTodoFr;
+        data.formValue =
+        app.modalConstants.todoNameEn + app.capzFirstLetter(data.method);
+        data.inputValue = data.method + app.modalConstants.inputSufix;
+        data.idValue =
+        data.method +
+        app.capzFirstLetter(app.modalConstants.todoNameEn) +
+        "Modal";
+        console.log("hello")
+    }
 
     app.createModal(e, data);
   },
@@ -176,6 +177,8 @@ var app = {
     const { isCard } = data;
     const { cardTodoIds } = data;
 
+    console.log(cardTodoIds)
+
     form.addEventListener("submit", (ev) =>
       app.handleFormModalSubmission(ev, isCard, cardTodoIds)
     );
@@ -183,6 +186,71 @@ var app = {
     closeModalButtons.forEach((button) => {
       button.addEventListener("click", app.hideModal);
     });
+  },
+
+  // Hide all opened modal
+  hideModal: function () {
+    const modals = document.querySelectorAll(".modal");
+
+    modals.forEach((modal) => {
+      modal.classList.remove("is-active");
+    });
+  },
+
+  // Creating and adding the card to the DOM
+  createCard: function (cardData) {
+    const template = document.getElementById("card");
+    const cardsContainer = document.querySelector(".cards-list");
+
+    const clone = document.importNode(template.content, true);
+
+    const title = clone.querySelector("h2");
+    const cardIdDiv = clone.querySelector(".panel");
+    const cardId = cardData.get("id");
+
+    cardIdDiv.dataset.cardId = cardId;
+    title.textContent = cardData.get("title");
+
+    //Events Listeners
+    clone
+      .getElementById("addTodoButton")
+      .addEventListener("click", (e) => app.newModalAttributes(e, isCard = false));
+
+    clone
+      .querySelector(".editCardButton")
+      .addEventListener("click", (e) => app.editModalAttributes(e, isCard = true, cardId));
+
+    cardsContainer.appendChild(clone);
+    app.hideModal();
+  },
+
+  // Creating and adding the todo to the DOM
+  createTodo: function (todo, cardId) {
+    const template = document.getElementById("todo");
+    const todosContainer = document.querySelector(
+      `[data-card-id="${cardId}"] .todos-list`
+    );
+
+    const clone = document.importNode(template.content, true);
+
+    const title = clone.querySelector(".todo__title");
+    const todoDiv = clone.querySelector(".box");
+    const todoId = todo.get("id");
+    todoDiv.dataset.todoId = todoId;
+    title.textContent = todo.get("title");
+
+    clone
+      .querySelector(".todo-delete")
+      .addEventListener("click", (e) =>
+        app.handleDeleteTodo(e, cardId, todoId)
+      );
+
+    clone
+      .querySelector(".todo-edit")
+      .addEventListener("click", (e) => app.editModalAttributes(e, isCard = false, cardId, todoId));
+
+    todosContainer.appendChild(clone);
+    app.hideModal();
   },
 
   // Getting the new card form's data on submission
@@ -231,10 +299,11 @@ var app = {
         };
 
         if (isCard === true) {
-          // const response = await fetch(app.base_url, options);
-          // if (!response.ok) throw json;
-          // const json = await response.json();
-          console.log("C'est une carte");
+          const { cardId } = cardTodoIds;
+
+          const response = await fetch( `${app.base_url}/${cardId}`, options);
+          if (!response.ok) throw json;
+          const json = await response.json();
         } else {
           const { cardId } = cardTodoIds;
           const { todoId } = cardTodoIds;
@@ -243,97 +312,12 @@ var app = {
             `${app.base_url}/${cardId}/todos/${todoId}`,
             options
           );
-
           if (!response.ok) throw json;
-
           const json = await response.json();
         }
       }
 
       location.reload();
-    } catch (error) {
-      console.log(error);
-      return;
-    }
-  },
-
-  // Hide all opened modal
-  hideModal: function () {
-    const modals = document.querySelectorAll(".modal");
-
-    modals.forEach((modal) => {
-      modal.classList.remove("is-active");
-    });
-  },
-
-  // Creating and adding the card to the DOM
-  createCard: function (cardData) {
-    const template = document.getElementById("card");
-    const cardsContainer = document.querySelector(".cards-list");
-    const isCard = false;
-
-    const clone = document.importNode(template.content, true);
-
-    clone
-      .getElementById("addTodoButton")
-      .addEventListener("click", (e) => app.makeNewModal(e, isCard));
-
-    const title = clone.querySelector("h2");
-    const cardId = clone.querySelector(".panel");
-
-    cardId.dataset.cardId = cardData.get("id");
-    title.textContent = cardData.get("title");
-
-    cardsContainer.appendChild(clone);
-    app.hideModal();
-  },
-
-  // Creating and adding the todo to the DOM
-  createTodo: function (todo, cardId) {
-    const template = document.getElementById("todo");
-    const todosContainer = document.querySelector(
-      `[data-card-id="${cardId}"] .todos-list`
-    );
-
-    const clone = document.importNode(template.content, true);
-
-    const title = clone.querySelector(".todo__title");
-    const todoDiv = clone.querySelector(".box");
-    const todoId = todo.get("id");
-    todoDiv.dataset.todoId = todoId;
-    title.textContent = todo.get("title");
-
-    clone
-      .querySelector(".todo-delete")
-      .addEventListener("click", (e) =>
-        app.handleDeleteTodo(e, cardId, todoId)
-      );
-
-    clone
-      .querySelector(".todo-edit")
-      .addEventListener("click", (e) =>
-        app.makeEditTodoModal(e, cardId, todoId)
-      );
-
-    todosContainer.appendChild(clone);
-    app.hideModal();
-  },
-
-  handleEditTodo: async function (e, cardId, todoId) {
-    e.preventDefault();
-    try {
-      const options = {
-        method: "UPDATE",
-      };
-
-      const response = await fetch(
-        `${app.base_url}/${cardId}/todos/${todoId}`,
-        options
-      );
-
-      location.reload();
-      const json = await response.json();
-      if (!response.ok) throw json;
     } catch (error) {
       console.log(error);
       return;
