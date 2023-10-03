@@ -103,16 +103,16 @@
 
                     <!-- TODO TEMPLATE -->
                     <template id="todo">
-                      <div class="box" data-card-id="J">
+                      <div class="box" data-todo-id="">
                         <div class="columns">
                           <div class="column todo__title"></div>
                           <div class="column is-narrow">
                             <a href="#">
-                              <span class="icon is-small has-text-primary">
+                              <span class="todo-edit icon is-small has-text-primary">
                                 <i class="fas fa-pencil-alt"></i>
                               </span>
                             </a>
-                            <a href="#">
+                            <a class="todo-delete" href="#">
                               <span class="icon is-small has-text-danger">
                                 <i class="fas fa-trash-alt"></i>
                               </span>
@@ -131,7 +131,7 @@
     </section>
 
     <template id="modal">
-      <div class="modal" id="">
+      <div class="modal" id="Modal">
         <div class="modal-background"></div>
         <div class="modal-card">
           <form id="" action="" method="POST">
