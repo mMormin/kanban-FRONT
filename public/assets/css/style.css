@@ -1,0 +1,34 @@
+body {
+  background-color: #ccc;
+  height: 100vh;
+}
+
+.card-lists {
+  overflow-x: auto;
+}
+
+.panel-block {
+  min-height: 80px;
+}
+
+.edit-card-button, .icon-button {
+  cursor: pointer;
+}
+
+button.icon-button {
+  border: 0;
+  background-color: inherit;
+  margin: 0;
+  padding: 0 !important;
+  padding-inline: inherit;
+}
+
+div.icon-button {
+
+}
+
+.d-flex {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}

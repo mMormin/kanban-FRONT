@@ -14,7 +14,7 @@
       src="https://use.fontawesome.com/releases/v5.3.1/js/all.js"
     ></script>
 
-    <script src="./assets/js/app.js"></script>
+    <script defer type="module" src="./assets/js/app.js"></script>
   </head>
 
   <body>
@@ -24,7 +24,8 @@
 
         <article class="error-box message is-warning is-small is-hidden">
           <div class="message-body">
-            Il semblererait qu'il n'y ai <strong>aucune carte</strong> dans ce tableau.
+            Il semblererait qu'il n'y ai <strong>aucune carte</strong> dans ce
+            tableau.
           </div>
         </article>
 
@@ -41,14 +42,13 @@
         <div class="columns">
           <div class="column is-full">
             <div class="cards-list columns">
-
               <!-- CARD TEMPLATE -->
               <template id="card">
                 <div class="column is-one-quarter panel" data-card-id="">
                   <div class="panel-heading has-background-info">
                     <div class="columns">
                       <div class="column">
-                        <h2 class="editCardButton has-text-white"></h2>
+                        <h2 class="edit-card-button has-text-white"></h2>
 
                         <form action="" method="POST" class="is-hidden">
                           <input type="hidden" name="list-id" value="1" />
@@ -73,33 +73,33 @@
                         </form>
                       </div>
 
-                      <div class="column is-narrow">
-                        <a href="#" id="addTodoButton" class="is-pulled-right">
-                          <span class="icon is-small has-text-white">
-                            <i class="fas fa-plus"></i>
-                          </span>
-                        </a>
+                      <div
+                        class="column is-narrow d-flex is-pulled-right add-todo-button icon-button"
+                      >
+                        <span class="icon is-small has-text-white">
+                          <i class="fas fa-plus"></i>
+                        </span>
                       </div>
                     </div>
                   </div>
                   <div
                     class="panel-block todos-list is-block has-background-light"
                   >
-                    <!-- DEFAULT TODO -->
-                    <!-- <div class="box" data-card-id="J">
+                    <!-- TODO SAMPLE -->
+                    <!-- <div class="box" data-card-id="sample">
                       <div class="columns">
-                        <div class="column">Nouvelle tâche</div>
+                        <div class="column">Sample Tâche</div>
                         <div class="column is-narrow">
-                          <a href="#">
+                          <button class="todo-edit-button icon-button">
                             <span class="icon is-small has-text-primary">
                               <i class="fas fa-pencil-alt"></i>
                             </span>
-                          </a>
-                          <a href="#">
+                          </button>
+                          <button class="todo-delete-button icon-button">
                             <span class="icon is-small has-text-danger">
                               <i class="fas fa-trash-alt"></i>
                             </span>
-                          </a>
+                          </button>
                         </div>
                       </div>
                     </div> -->
@@ -110,16 +110,16 @@
                         <div class="columns">
                           <div class="column todo__title"></div>
                           <div class="column is-narrow">
-                            <a href="#">
-                              <span class="todo-edit icon is-small has-text-primary">
+                            <button class="todo-edit-button icon-button">
+                              <span class="icon is-small has-text-primary">
                                 <i class="fas fa-pencil-alt"></i>
                               </span>
-                            </a>
-                            <a class="todo-delete" href="#">
+                            </button>
+                            <button class="todo-delete-button icon-button">
                               <span class="icon is-small has-text-danger">
                                 <i class="fas fa-trash-alt"></i>
                               </span>
-                            </a>
+                            </button>
                           </div>
                         </div>
                       </div>
@@ -160,17 +160,18 @@
                   />
                 </div>
               </div>
-              <input id="todoId" type="hidden" name="id" value="" />
+              <input class="input-card-id" type="hidden" name="id" value="" />
             </section>
             <footer class="modal-card-foot">
               <button class="button is-success">Créer</button>
               <button class="button close" type="button">Annuler</button>
             </footer>
           </form>
+          <button class="button card-delete-button is-hidden is-danger">
+            Supprimer la carte
+          </button>
         </div>
       </div>
     </template>
-
-
   </body>
 </html>
