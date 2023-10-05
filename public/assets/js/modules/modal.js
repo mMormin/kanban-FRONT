@@ -115,7 +115,7 @@ export const modalModule = {
 
     // If TODO, set cardId with data-card-id's value
     if (!data.isCard) {
-      const { cardId } = e.target.closest(".panel").dataset;
+      const { cardId } = e.target.closest(".card").dataset;
       idInput.value = cardId;
     }
 
@@ -130,7 +130,7 @@ export const modalModule = {
 
     // If CARD and EDIT, display the card delete button
     if (data.isCard && data.method === "edit") {
-      const { cardId } = e.target.closest(".panel").dataset;
+      const { cardId } = e.target.closest(".card").dataset;
       deleteCardButton.classList.remove("is-hidden");
 
       // Event Listener

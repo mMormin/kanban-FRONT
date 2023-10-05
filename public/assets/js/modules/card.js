@@ -3,16 +3,23 @@ import { modalModule } from "./modal.js";
 export const cardModule = {
   isNotCard: false,
   isCard: true,
-  
+
   // To Create and Set the card in the DOM
   createCard: function (cardData) {
     const template = document.getElementById("card");
     const cardsContainer = document.querySelector(".cards-list");
 
+    Sortable.create(cardsContainer, {
+      ghostClass: "ghost-card",
+      chosenClass: "chosen-card",
+      animation: 500,
+      direction: "horizontal",
+    });
+
     const clone = document.importNode(template.content, true);
 
     const title = clone.querySelector("h2");
-    const cardIdDiv = clone.querySelector(".panel");
+    const cardIdDiv = clone.querySelector(".card");
     const cardId = cardData.get("id");
 
     cardIdDiv.dataset.cardId = cardId;
@@ -32,7 +39,7 @@ export const cardModule = {
       );
 
     cardsContainer.appendChild(clone);
-    
+
     modalModule.hideModal();
   },
-}
+};

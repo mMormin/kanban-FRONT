@@ -23,12 +23,38 @@ button.icon-button {
   padding-inline: inherit;
 }
 
-div.icon-button {
+.card {
+  margin: 0.75rem;
+  padding: 0;
+  height: 100%;
+  box-shadow: rgba(0, 0, 0, 0.1) 0px 10px 15px -3px, rgba(0, 0, 0, 0.05) 0px 4px 6px -2px;
+  cursor: move;
+}
 
+.panel-heading, .card {
+  border-radius: 5px 5px 0 0;
 }
 
 .d-flex {
   display: flex;
   justify-content: center;
   align-items: center;
+}
+
+.panel-block, .panel-heading, .panel-tabs {
+  border: 0;
+}
+
+.panel-block {
+  padding: 1em 1.35em;
+}
+
+.chosen-card .has-background-light,
+.chosen-card .has-background-info,
+.chosen-card .box,
+.ghost-card .has-background-light,
+.ghost-card .has-background-info,
+.ghost-card .box {
+  background: #4fb3f5!important;
+  box-shadow: inherit;
 }
