@@ -7,7 +7,7 @@ Install the dependencies
 npm i
 ```
 
-*Express is the only dep to avoid CORS errors caused by "le méchant CORS"*
+*Express is there only to avoid CORS errors caused by "le méchant CORS"*
 
 </br>
 
