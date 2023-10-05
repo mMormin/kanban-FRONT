@@ -21,9 +21,11 @@ npm run dev
 </br>
 
 ## Works In Progress
-- Drag and drop
+- Drag and drop (position)
+  - on card
+  - on todo
 - Todo tags
-- Todo colors
+- Cards/Todo colors
 
 </br>
 
