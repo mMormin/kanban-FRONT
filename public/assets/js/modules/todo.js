@@ -10,6 +10,12 @@ export const todoModule = {
       `[data-card-id="${cardId}"] .todos-list`
     );
 
+    Sortable.create(todosContainer, {
+      ghostClass: "ghost-todo",
+      chosenClass: "chosen-todo",
+      animation: 300
+    });
+
     const clone = document.importNode(template.content, true);
 
     const title = clone.querySelector(".todo__title");

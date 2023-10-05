@@ -49,6 +49,11 @@ button.icon-button {
   padding: 1em 1.35em;
 }
 
+.box {
+  border: 1px solid transparent;
+  box-shadow: rgba(0, 0, 0, 0.1) 0px 1px 3px 0px, rgba(0, 0, 0, 0.06) 0px 1px 2px 0px;
+}
+
 .chosen-card .has-background-light,
 .chosen-card .has-background-info,
 .chosen-card .box,
@@ -58,3 +63,17 @@ button.icon-button {
   background: #4fb3f5!important;
   box-shadow: inherit;
 }
+
+.ghost-card .box, .chosen-card .box {
+  border: 1px solid white;
+  color: white;
+  box-shadow: none;
+}
+
+.ghost-card .box .column.is-narrow, .chosen-card .box .column.is-narrow {
+  opacity: 0;
+}
+
+
+.ghost-todo, .chosen-todo {
+  box-shadow: rgba(0, 0, 0, 0.45) 0px 25px 20px -20px;}
