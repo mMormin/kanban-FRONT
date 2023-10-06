@@ -9,8 +9,7 @@ const app = {
 
   init: function () {
     apiFetcher.fetchAllFromApi();
-    
-    const isCard = true;
+  
     const newCardButton = document.getElementById("addCardButton");
 
     // Event Listener

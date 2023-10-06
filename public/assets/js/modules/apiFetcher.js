@@ -1,5 +1,6 @@
 import { cardModule } from "./card.js";
 import { todoModule } from "./todo.js";
+import { tagModule } from "./tag.js";
 
 export const apiFetcher = {
   base_url: "http://localhost:3000/boards/1/cards",
@@ -32,8 +33,15 @@ export const apiFetcher = {
           }
 
           const cardId = todoData.get("card_id");
+          const todoId = todoData.get("id");
 
           todoModule.createTodo(todoData, cardId);
+
+          todo.tags.forEach((tagData) => {
+            //const todoId = tagData.id;
+
+            tagModule.createTag(tagData, cardId, todoId);
+          });
         });
       });
     } catch (error) {

@@ -13,7 +13,7 @@ export const todoModule = {
     Sortable.create(todosContainer, {
       ghostClass: "ghost-todo",
       chosenClass: "chosen-todo",
-      animation: 300
+      animation: 300,
     });
 
     const clone = document.importNode(template.content, true);
