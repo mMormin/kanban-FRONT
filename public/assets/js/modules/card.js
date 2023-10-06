@@ -1,5 +1,4 @@
 import { apiFetcher } from "./apiFetcher.js";
-
 import { modalModule } from "./modal.js";
 
 export const cardModule = {
@@ -8,30 +7,17 @@ export const cardModule = {
 
   // To Create and Set the card in the DOM
   createCard: function (cardData) {
-    const template = document.getElementById("card");
+    const templateContent = document.getElementById("card").content;
     const cardsContainer = document.querySelector(".cards-list");
     const cardId = cardData.get("id");
 
-    Sortable.create(cardsContainer, {
-      ghostClass: "ghost-card",
-      chosenClass: "chosen-card",
-      animation: 500,
-      direction: "horizontal",
-      // onEnd: function (evt) {
-      //   const cardIndex = evt.newIndex;
-      //   cardModule.changeCardPosition(cardId, cardIndex);
-      // },
-    });
-
-    const clone = document.importNode(template.content, true);
+    const clone = document.importNode(templateContent, true);
 
     const title = clone.querySelector("h2");
-
     const cardIdDiv = clone.querySelector(".card");
-
     cardIdDiv.dataset.cardId = cardId;
-    //cardIdDiv.style.order = cardData.get("position");
     title.textContent = cardData.get("title");
+    //cardIdDiv.style.order = cardData.get("position");
 
     // Events Listeners
     clone
@@ -48,25 +34,20 @@ export const cardModule = {
 
     cardsContainer.appendChild(clone);
 
+    const dragAndDropCard = Sortable.create(cardsContainer, {
+      ghostClass: "ghost-card",
+      chosenClass: "chosen-card",
+      animation: 500,
+      direction: "horizontal",
+    });
+
+    dragAndDropCard.option("onUpdate", function (evt) {
+      const movedCardId = evt.item.dataset.cardId;
+      const isMovedCardId = evt.from.children[evt.oldIndex].dataset.cardId;
+
+      apiFetcher.swapCardsPositions(movedCardId, isMovedCardId);
+    });
+
     modalModule.hideModal();
-  },
-
-  changeCardPosition: async function (cardId, direction) {
-    try {
-      const cardOptions = {
-        method: "PATCH",
-      };
-
-      const cardResponse = await fetch(
-        `${apiFetcher.base_url}/${cardId}?dir=${direction}`,
-        cardOptions
-      );
-
-      const json = await cardResponse.json();
-      if (!cardResponse.ok) throw json;
-    } catch (error) {
-      console.log(error);
-      return;
-    }
   },
 };

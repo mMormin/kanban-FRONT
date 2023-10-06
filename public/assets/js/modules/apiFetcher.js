@@ -50,6 +50,23 @@ export const apiFetcher = {
     }
   },
 
+  swapCardsPositions: async function (movedCardId, isMovedCardId) {
+    try {
+      const cardOptions = {
+        method: "PATCH",
+      };
+      const cardResponse = await fetch(
+        `${apiFetcher.base_url}/${movedCardId}?swap_position=${isMovedCardId}`,
+        cardOptions
+      );
+      const json = await cardResponse.json();
+      if (!cardResponse.ok) throw json;
+    } catch (error) {
+      console.log(error);
+      return;
+    }
+  },
+
   // To Handle the submission of a new card or todo
   submitCardOrTodoForm: async function (e, isCard, cardTodoIds) {
     e.preventDefault();
