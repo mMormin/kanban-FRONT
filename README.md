@@ -21,20 +21,16 @@ npm run dev
 </br>
 
 ## Works In Progress
-- Drag and drop (position)
-  - on card
-  - on todo
-- Todo tags
-- Cards/Todo colors
+- Board
 
 </br>
 
 ## BackLogu
 - [x] Card edit/delete
 - [x] Todo edit/delete
-- [ ] Drag and drop
-- [ ] Todo tags
-- [ ] Todo colors
+- [x] Drag and drop between 2Cards & 2Todos
+- [x] Todo tags
+- [x] Todo colors
 - [ ] Board
 - [ ] User auth (vanilla + google)
 - [ ] front + back

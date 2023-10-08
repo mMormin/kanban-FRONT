@@ -9,9 +9,7 @@ export const tagModule = {
 
     const tagSpan = clone.querySelector(".tag");
     tagSpan.style.backgroundColor = tag.color;
-    tagSpan.textContent = tag.name;
-
-   // tagsContainer.appendChild(clone);
+    //tagSpan.textContent = tag.name;
 
     tagsContainer.insertBefore(clone, tagsContainer.firstChild);
   },

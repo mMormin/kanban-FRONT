@@ -17,7 +17,6 @@ export const cardModule = {
     const cardIdDiv = clone.querySelector(".card");
     cardIdDiv.dataset.cardId = cardId;
     title.textContent = cardData.get("title");
-    //cardIdDiv.style.order = cardData.get("position");
 
     // Events Listeners
     clone
@@ -34,14 +33,16 @@ export const cardModule = {
 
     cardsContainer.appendChild(clone);
 
-    const dragAndDropCard = Sortable.create(cardsContainer, {
+    const dragAndDropOnCard = Sortable.create(cardsContainer, {
       ghostClass: "ghost-card",
       chosenClass: "chosen-card",
+      swapClass: "highlight-card",
+      swap: true,
       animation: 500,
       direction: "horizontal",
     });
 
-    dragAndDropCard.option("onUpdate", function (evt) {
+    dragAndDropOnCard.option("onUpdate", function (evt) {
       const movedCardId = evt.item.dataset.cardId;
       const isMovedCardId = evt.from.children[evt.oldIndex].dataset.cardId;
 

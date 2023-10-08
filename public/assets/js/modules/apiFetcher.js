@@ -38,9 +38,9 @@ export const apiFetcher = {
           todoModule.createTodo(todoData, cardId);
 
           todo.tags.forEach((tagData) => {
-            //const todoId = tagData.id;
 
             tagModule.createTag(tagData, cardId, todoId);
+
           });
         });
       });
@@ -50,17 +50,36 @@ export const apiFetcher = {
     }
   },
 
+  // To swap the position between two given cards Id
   swapCardsPositions: async function (movedCardId, isMovedCardId) {
     try {
       const cardOptions = {
         method: "PATCH",
       };
-      const cardResponse = await fetch(
-        `${apiFetcher.base_url}/${movedCardId}?swap_position=${isMovedCardId}`,
+      const response = await fetch(
+        `${apiFetcher.base_url}/${movedCardId}?swapped_card=${isMovedCardId}`,
         cardOptions
       );
-      const json = await cardResponse.json();
-      if (!cardResponse.ok) throw json;
+      const json = await response.json();
+      if (!response.ok) throw json;
+    } catch (error) {
+      console.log(error);
+      return;
+    }
+  },
+
+  // To swap the position between two given todos Id in one cardId
+  swapTodosPositions: async function (cardId, movedTodoId, isMovedTodoId) {
+    try {
+      const todoOptions = {
+        method: "PATCH",
+      };
+      const response = await fetch(
+        `${apiFetcher.base_url}/${cardId}/todos/${movedTodoId}?swapped_todo=${isMovedTodoId}`,
+        todoOptions
+      );
+      const json = await response.json();
+      if (!response.ok) throw json;
     } catch (error) {
       console.log(error);
       return;

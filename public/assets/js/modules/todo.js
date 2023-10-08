@@ -9,18 +9,12 @@ export const todoModule = {
     const todosContainer = document.querySelector(
       `[data-card-id="${cardId}"] .todos-list`
     );
-
-    Sortable.create(todosContainer, {
-      ghostClass: "ghost-todo",
-      chosenClass: "chosen-todo",
-      animation: 300,
-    });
+    const todoId = todo.get("id");
 
     const clone = document.importNode(template.content, true);
 
     const title = clone.querySelector(".todo__title");
     const todoDiv = clone.querySelector(".box");
-    const todoId = todo.get("id");
     todoDiv.dataset.todoId = todoId;
     title.textContent = todo.get("title");
 
@@ -38,6 +32,21 @@ export const todoModule = {
       );
 
     todosContainer.appendChild(clone);
+
+    const dragAndDropOnTodo = Sortable.create(todosContainer, {
+      ghostClass: "ghost-todo",
+      chosenClass: "chosen-todo",
+      swapClass: "highlight-todo",
+      swap: true,
+      animation: 300,
+    });
+
+    dragAndDropOnTodo.option("onUpdate", function (evt) {
+      const movedTodoId = evt.item.dataset.todoId;
+      const isMovedTodoId = evt.from.children[evt.oldIndex].dataset.todoId;
+
+      apiFetcher.swapTodosPositions(cardId, movedTodoId, isMovedTodoId);
+    });
 
     modalModule.hideModal();
   },
