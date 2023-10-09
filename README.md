@@ -2,16 +2,14 @@
 
 ## How to check this out ?
 
-Install the dependencies
+Install [vite dependency](https://github.com/vitejs/vite)
 ```bash
 npm i
 ```
 
-*Express is there only to avoid CORS errors caused by "le méchant CORS"*
-
 </br>
 
-Launch the server
+Launch vite server
 ```bash
 npm run dev
 ```
