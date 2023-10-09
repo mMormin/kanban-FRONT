@@ -120,8 +120,8 @@ export const modalModule = {
     }
 
     // Events Listeners
-    form.addEventListener("submit", (ev) =>
-      apiFetcher.submitCardOrTodoForm(ev, isCard, cardTodoIds)
+    form.addEventListener("submit", (e) =>
+      apiFetcher.submitCardOrTodoForm(e, isCard, cardTodoIds)
     );
 
     closeModalButtons.forEach((button) => {

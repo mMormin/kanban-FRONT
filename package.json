@@ -1,14 +1,14 @@
 {
   "name": "okanban-front-mmormin",
   "version": "1.0.0",
-  "description": "",
-  "main": "server.js",
+  "description": "okanban FrontEnd",
   "scripts": {
-    "dev": "nodemon server.js"
+    "dev": "vite",
+    "build": "vite build"
   },
-  "author": "",
+  "author": "mMormin",
   "license": "ISC",
   "dependencies": {
-    "express": "^4.18.2"
+    "vite": "^4.4.11"
   }
 }
