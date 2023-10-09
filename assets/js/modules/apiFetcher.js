@@ -1,3 +1,4 @@
+import { modalModule } from "./modal.js";
 import { cardModule } from "./card.js";
 import { todoModule } from "./todo.js";
 import { tagModule } from "./tag.js";
@@ -52,14 +53,12 @@ export const apiFetcher = {
   submitCardOrTodoForm: async function (e, isCard, cardTodoIds) {
     e.preventDefault();
 
-    console.log(e);
+    const form = e.target;
+    let options = {};
+    const formData = new FormData(form);
+    const title = formData.get("title");
 
     try {
-      const form = e.target;
-      let options = {};
-      const formData = new FormData(form);
-      const title = formData.get("title");
-
       if (!title) {
         alert(
           `Impossible de publier une ${isCard ? "carte" : "todo"} sans nom !`
@@ -75,49 +74,58 @@ export const apiFetcher = {
 
         if (isCard === true) {
           const response = await fetch(apiFetcher.base_url, options);
-          if (!response.ok) throw json;
           const json = await response.json();
+          if (!response.ok) throw json;
+
+          cardModule.createCard(formData);
         } else {
           const cardId = formData.get("id");
+
+          console.log(cardId);
+
           const response = await fetch(
             `${apiFetcher.base_url}/${cardId}/todos`,
             options
           );
-
           if (!response.ok) throw json;
-
           const json = await response.json();
+
+          todoModule.createTodo(formData, cardId);
         }
       } else {
-        formData.delete("id");
+        const { cardId } = cardTodoIds;
+        const cardInDom = document.querySelector(`[data-card-id="${cardId}"]`);
+        const titleCard = cardInDom.querySelector("h2");
+        const todoInDom = document.querySelector(`[data-todo-id="${todoId}"]`);
+        const nameTodo = todoInDom.querySelector(".todo__title");
+
         options = {
           method: "PATCH",
           body: formData,
         };
 
         if (isCard === true) {
-          const { cardId } = cardTodoIds;
-
           const response = await fetch(
             `${apiFetcher.base_url}/${cardId}`,
             options
           );
-          if (!response.ok) throw json;
           const json = await response.json();
-        } else {
-          const { cardId } = cardTodoIds;
-          const { todoId } = cardTodoIds;
+          if (!response.ok) throw json;
 
+          titleCard.textContent = json.title;
+        } else {
+          const { todoId } = cardTodoIds;
           const response = await fetch(
             `${apiFetcher.base_url}/${cardId}/todos/${todoId}`,
             options
-          );
-          if (!response.ok) throw json;
-          const json = await response.json();
-        }
-      }
+            );
+            const json = await response.json();
+            if (!response.ok) throw json;
 
-      location.reload();
+            nameTodo.textContent = json.title;
+          }
+          modalModule.hideModal();
+      }
     } catch (error) {
       console.log(error);
       return;
@@ -127,14 +135,18 @@ export const apiFetcher = {
   // To Handle the deletion of a card or a todo
   deleteCardOrTodo: async function (e, cardId, todoId) {
     e.preventDefault();
+    const cardInDom = document.querySelector(`[data-card-id="${cardId}"]`);
+    const todoInDom = document.querySelector(`[data-todo-id="${todoId}"]`);
+    
+    const options = {
+      method: "DELETE",
+    };
 
     try {
-      const options = {
-        method: "DELETE",
-      };
-
-      location.reload();
       if (!todoId) {
+        cardInDom.remove();
+        modalModule.hideModal();
+
         const response = await fetch(
           `${apiFetcher.base_url}/${cardId}`,
           options
@@ -143,6 +155,9 @@ export const apiFetcher = {
         const json = await response.json();
         if (!response.ok) throw json;
       } else {
+        todoInDom.remove();
+        modalModule.hideModal();
+
         const response = await fetch(
           `${apiFetcher.base_url}/${cardId}/todos/${todoId}`,
           options
@@ -150,10 +165,10 @@ export const apiFetcher = {
 
         const json = await response.json();
         if (!response.ok) throw json;
+        alert("Impossible de supprimer cette carte...");
       }
     } catch (error) {
       console.log(error);
-      return;
     }
   },
 
