@@ -4,12 +4,12 @@ import { todoModule } from "./todo.js";
 import { tagModule } from "./tag.js";
 
 export const apiFetcher = {
-  base_url: "http://localhost:3000/boards/1/cards",
+  base_url: "http://localhost:3000",
 
   // To Get all the cards and todos
   fetchAllFromApi: async function () {
     try {
-      const response = await fetch(apiFetcher.base_url);
+      const response = await fetch(`${apiFetcher.base_url}/boards/1/cards`);
       const json = await response.json();
       if (!response.ok) throw json;
 
@@ -24,7 +24,7 @@ export const apiFetcher = {
           cardData.append(key, card[key]);
         }
 
-        cardModule.createCard(cardData);
+        cardModule.makeCard(cardData);
 
         card.todos.forEach((todo) => {
           const todoData = new FormData();
@@ -36,108 +36,164 @@ export const apiFetcher = {
           const cardId = todoData.get("card_id");
           const todoId = todoData.get("id");
 
-          todoModule.createTodo(todoData, cardId);
+          todoModule.makeTodo(todoData, cardId);
 
           todo.tags.forEach((tagData) => {
-            tagModule.createTag(tagData, cardId, todoId);
+            tagModule.makeTag(tagData, cardId, todoId);
           });
         });
       });
     } catch (error) {
       console.log(error);
-      return;
     }
   },
 
-  // To Handle the submission of a new card or todo
-  submitCardOrTodoForm: async function (e, isCard, cardTodoIds) {
+  getAllTags: async function () {
+    try {
+      const response = await fetch(`${apiFetcher.base_url}/tags`);
+      const json = await response.json();
+      if (!response.ok) throw json;
+      
+      return json;
+    } catch (error) {
+      console.log(error);
+    }
+  },
+
+  getTagsByTodo: async function (cardId, todoId) {
+    try {
+      const response = await fetch(`${apiFetcher.base_url}/board/1/cards/${cardId}/todos/${todoId}/tags`);
+      const json = await response.json();
+      if (!response.ok) throw json;
+      
+      return json;
+    } catch (error) {
+      console.log(error);
+    }
+  },
+
+  // To Handle the submission of a new card, todo or tag
+  submitAddFormData: async function (e, dataType) {
     e.preventDefault();
 
     const form = e.target;
-    let options = {};
+    const options = {
+      method: "POST",
+      body: formData,
+    };
     const formData = new FormData(form);
     const title = formData.get("title");
 
     try {
       if (!title) {
-        alert(
-          `Impossible de publier une ${isCard ? "carte" : "todo"} sans nom !`
-        );
+        alert(`Impossible de publier sans nom !`);
         return;
       }
 
-      if (!cardTodoIds) {
-        options = {
-          method: "POST",
-          body: formData,
-        };
+      if (dataType === "isCard") {
+        const response = await fetch(
+          `${apiFetcher.base_url}/boards/1/cards`,
+          options
+        );
+        const json = await response.json();
+        if (!response.ok) throw json;
 
-        if (isCard === true) {
-          const response = await fetch(apiFetcher.base_url, options);
-          const json = await response.json();
-          if (!response.ok) throw json;
+        cardModule.makeCard(formData);
+      } else if (dataType === "isTodo") {
+        const cardId = formData.get("id");
 
-          cardModule.createCard(formData);
-        } else {
-          const cardId = formData.get("id");
+        const response = await fetch(
+          `${apiFetcher.base_url}/boards/1/cards/${cardId}/todos`,
+          options
+        );
+        if (!response.ok) throw json;
+        const json = await response.json();
 
-          console.log(cardId);
+        todoModule.makeTodo(formData, cardId);
+      } 
+      // else if (dataType === "isTag") {
+      //   const response = await fetch(`${apiFetcher.base_url}/tags`, options);
+      //   const json = await response.json();
+      //   if (!response.ok) throw json;
+      // }
 
-          const response = await fetch(
-            `${apiFetcher.base_url}/${cardId}/todos`,
-            options
-          );
-          if (!response.ok) throw json;
-          const json = await response.json();
-
-          todoModule.createTodo(formData, cardId);
-        }
-      } else {
-        const { cardId } = cardTodoIds;
-        const cardInDom = document.querySelector(`[data-card-id="${cardId}"]`);
-        const titleCard = cardInDom.querySelector("h2");
-        const todoInDom = document.querySelector(`[data-todo-id="${todoId}"]`);
-        const nameTodo = todoInDom.querySelector(".todo__title");
-
-        options = {
-          method: "PATCH",
-          body: formData,
-        };
-
-        if (isCard === true) {
-          const response = await fetch(
-            `${apiFetcher.base_url}/${cardId}`,
-            options
-          );
-          const json = await response.json();
-          if (!response.ok) throw json;
-
-          titleCard.textContent = json.title;
-        } else {
-          const { todoId } = cardTodoIds;
-          const response = await fetch(
-            `${apiFetcher.base_url}/${cardId}/todos/${todoId}`,
-            options
-            );
-            const json = await response.json();
-            if (!response.ok) throw json;
-
-            nameTodo.textContent = json.title;
-          }
-          modalModule.hideModal();
-      }
+      return modalModule.hideModal();
     } catch (error) {
       console.log(error);
-      return;
+      alert("L'ajout n'est pas possible.");
     }
   },
 
-  // To Handle the deletion of a card or a todo
+  // To Handle the edition of a card, todo or tag
+  submitEditFormData: async function (e, dataType, ids) {
+    e.preventDefault();
+
+    const form = e.target;
+    const formData = new FormData(form);
+    const title = formData.get("title");
+    const { cardId } = ids;
+    const options = {
+      method: "PATCH",
+      body: formData,
+    };
+
+    if (!title) {
+      alert(`Impossible de publier sans nom !`);
+      return;
+    }
+
+    try {
+      if (dataType === "isCard") {
+        console.log(cardId);
+
+        const cardInDom = document.querySelector(`[data-card-id="${cardId}"]`);
+        const titleCard = cardInDom.querySelector("h2");
+
+        const response = await fetch(
+          `${apiFetcher.base_url}/${cardId}`,
+          options
+        );
+        const json = await response.json();
+        if (!response.ok) throw json;
+
+        titleCard.textContent = json.title;
+      } else if (dataType === "isTodo") {
+        const { cardId } = ids;
+        const { todoId } = ids;
+        const todoInDom = document.querySelector(`[data-todo-id="${todoId}"]`);
+        const nameTodo = todoInDom.querySelector(".todo__title");
+
+        const response = await fetch(
+          `${apiFetcher.base_url}/boards/1/cards/${cardId}/todos/${todoId}`,
+          options
+        );
+        const json = await response.json();
+        if (!response.ok) throw json;
+
+        nameTodo.textContent = json.title;
+      } else if (dataType === "isTag") {
+        const { tagId } = ids;
+        const response = await fetch(
+          `${apiFetcher.base_url}/tags/${tagId}`,
+          options
+        );
+        const json = await response.json();
+        if (!response.ok) throw json;
+      }
+
+      return modalModule.hideModal();
+    } catch (error) {
+      console.log(error);
+      alert("L'édition n'est pas possible.");
+    }
+  },
+
+  // To Handle the deletion of a card, todo or tag
   deleteCardOrTodo: async function (e, cardId, todoId) {
     e.preventDefault();
     const cardInDom = document.querySelector(`[data-card-id="${cardId}"]`);
     const todoInDom = document.querySelector(`[data-todo-id="${todoId}"]`);
-    
+
     const options = {
       method: "DELETE",
     };
@@ -148,7 +204,7 @@ export const apiFetcher = {
         modalModule.hideModal();
 
         const response = await fetch(
-          `${apiFetcher.base_url}/${cardId}`,
+          `${apiFetcher.base_url}/boards/1/cards/${cardId}`,
           options
         );
 
@@ -159,16 +215,16 @@ export const apiFetcher = {
         modalModule.hideModal();
 
         const response = await fetch(
-          `${apiFetcher.base_url}/${cardId}/todos/${todoId}`,
+          `${apiFetcher.base_url}/boards/1/cards${cardId}/todos/${todoId}`,
           options
         );
 
         const json = await response.json();
         if (!response.ok) throw json;
-        alert("Impossible de supprimer cette carte...");
       }
     } catch (error) {
       console.log(error);
+      alert("La suppression n'est pas possible.");
     }
   },
 
@@ -179,14 +235,13 @@ export const apiFetcher = {
         method: "PATCH",
       };
       const response = await fetch(
-        `${apiFetcher.base_url}/${movedCardId}?swapped_card=${isMovedCardId}`,
+        `${apiFetcher.base_url}/boards/1/cards/${movedCardId}?swapped_card=${isMovedCardId}`,
         cardOptions
       );
       const json = await response.json();
       if (!response.ok) throw json;
     } catch (error) {
       console.log(error);
-      return;
     }
   },
 
@@ -197,7 +252,7 @@ export const apiFetcher = {
         method: "PATCH",
       };
       const response = await fetch(
-        `${apiFetcher.base_url}/${cardId}/todos/${movedTodoId}?swapped_todo=${isMovedTodoId}`,
+        `${apiFetcher.base_url}/boards/1/cards/${cardId}/todos/${movedTodoId}?swapped_todo=${isMovedTodoId}`,
         todoOptions
       );
       const json = await response.json();

@@ -2,11 +2,11 @@ import { apiFetcher } from "./apiFetcher.js";
 import { modalModule } from "./modal.js";
 
 export const cardModule = {
-  isNotCard: false,
-  isCard: true,
+  isTodo: "isTodo",
+  isCard: "isCard",
 
   // To Create and Set the card in the DOM
-  createCard: function (cardData) {
+  makeCard: function (cardData) {
     const templateContent = document.getElementById("card").content;
     const cardsContainer = document.querySelector(".cards-list");
     const cardId = cardData.get("id");
@@ -22,9 +22,10 @@ export const cardModule = {
     clone
       .querySelector(".add-todo-button")
       .addEventListener("click", (e) =>
-        modalModule.newModalAttributes(e, cardModule.isNotCard)
+        modalModule.newModalAttributes(e, cardModule.isTodo)
       );
 
+      
     clone
       .querySelector(".edit-card-button")
       .addEventListener("click", (e) =>

@@ -3,12 +3,20 @@ body {
   height: 100vh;
 }
 
+.modal-background {
+  cursor: pointer;
+}
+
 .card-lists {
   overflow-x: auto;
 }
 
 .panel-block {
   min-height: 80px;
+}
+
+.select, select {
+  width: 100%;
 }
 
 .edit-card-button,
@@ -117,8 +125,24 @@ button.icon-button {
   padding: 0 0.75rem;
 }
 
+.tag--big {
+  border-radius: 3px;
+  padding: 3px 11px;
+  min-width: 33px;
+  font-size: 11px;
+  color: white;
+  text-transform: uppercase;
+  font-weight: bold;
+  letter-spacing: 1px;
+  margin: 0 auto;
+}
+
+.tag--big-variant {
+  color: black;
+}
+
 .tag {
   border-radius: 3px !important;
   height: 0.7em !important;
-  width: 33px !important;
+  min-width: 33px !important;
 }

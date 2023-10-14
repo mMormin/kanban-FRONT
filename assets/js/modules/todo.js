@@ -4,7 +4,7 @@ import { cardModule } from "./card.js";
 
 export const todoModule = {
   // To Create and Set the todo in the DOM
-  createTodo: function (todo, cardId) {
+  makeTodo: function (todo, cardId) {
     const template = document.getElementById("todo");
     const todosContainer = document.querySelector(
       `[data-card-id="${cardId}"] .todos-list`
@@ -28,7 +28,7 @@ export const todoModule = {
     clone
       .querySelector(".todo-edit-button")
       .addEventListener("click", (e) =>
-        modalModule.editModalAttributes(e, cardModule.isNotCard, cardId, todoId)
+        modalModule.editModalAttributes(e, cardModule.isTodo, cardId, todoId)
       );
 
     todosContainer.appendChild(clone);
