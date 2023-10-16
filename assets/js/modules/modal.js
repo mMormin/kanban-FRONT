@@ -31,7 +31,7 @@ export const modalModule = {
       submitValue: "Créer",
     };
 
-    if (dataType === isTodo || dataType === isTag) {
+    if (dataType === "isTodo" || dataType === "isTag") {
       try {
         const tags = await apiFetcher.getAllTags();
         data.tags = tags;
@@ -60,13 +60,16 @@ export const modalModule = {
       },
     };
 
-    if (dataType === isTodo) {
+    if (dataType === "isTodo") {
       try {
-        const tags = await apiFetcher.getTagsByTodo(
+        const tags = await apiFetcher.getAllTags();
+
+        const todoTags = await apiFetcher.getTagsByTodo(
           data.ids.cardId,
           data.ids.todoId
         );
 
+        data.todoTags = todoTags;
         data.tags = tags;
       } catch (error) {
         data.tags = null;
@@ -116,7 +119,7 @@ export const modalModule = {
     modalModule.createModal(e, data);
   },
 
-  // To Create and Set the new Modal in the DOM
+  // To Create and Set the Modal in DOM
   createModal: async function (e, data) {
     const { type } = data;
     const { ids } = data;
@@ -141,7 +144,7 @@ export const modalModule = {
 
     const closeModalButtons = form.querySelectorAll(".close");
 
-    // Defaults Values
+    // Default Values assignment
     modal.setAttribute("id", data.idValue);
     form.setAttribute("id", data.formValue);
     title.textContent = data.titleValue;
@@ -150,6 +153,104 @@ export const modalModule = {
     input.setAttribute("placeholder", data.placeholderValue);
     input.value = input.placeholder;
     submit.textContent = data.submitValue;
+
+    // Specific Values and Events Listeners
+    if (data.type === "isTodo") {
+      const { tags } = data;
+      const { cardId } = e.target.closest(".card").dataset;
+      idInput.value = cardId;
+
+      if (!tags) {
+        tagsDiv.parentNode.classList.add("is-hidden");
+      } else {
+        tags.forEach((tag) => {
+          const li = document.createElement("li");
+
+          li.classList.add("tag--big");
+          li.classList.add("tag--toggleable");
+          li.style.backgroundColor = "grey";
+          li.textContent = tag.name;
+          li.dataset.tagId = tag.id;
+
+          // Events Listeners
+          li.addEventListener("mouseenter", (ev) =>
+            modalModule.mouseEnterTag(ev, tag.color)
+          );
+          li.addEventListener("mouseleave", (ev) =>
+            modalModule.mouseLeaveTag(ev, tag.color)
+          );
+          li.addEventListener("click", (ev) =>
+            modalModule.toggleTag(ev, tag.color)
+          );
+
+          if (data.method === "edit") {
+            data.todoTags.forEach((todoTag) => {
+              if (tag.id === todoTag.id) {
+                li.classList.add("selected");
+                li.style.backgroundColor = todoTag.color;
+              }
+            });
+          }
+
+          if (li.style.backgroundColor === "yellow") {
+            li.classList.add("tag--big-variant");
+          }
+
+          tagsDiv.appendChild(li);
+        });
+
+        tagsDiv.classList.remove("is-hidden");
+        tagsDiv.parentNode.classList.remove("is-hidden");
+        tagsLabel.textContent = "Associé aux catégories";
+      }
+    } else if (data.type === "isTag") {
+      const { tags } = data;
+
+      if (!tags) {
+        tagsDiv.textContent = "Aucune catégorie trouvée.";
+      } else {
+        tags.forEach((tag) => {
+          const li = document.createElement("li");
+
+          li.classList.add("tag--big");
+          li.style.backgroundColor = tag.color;
+          if (li.style.backgroundColor === "yellow") {
+            li.classList.toggle("tag--big-variant");
+          }
+          li.textContent = tag.name;
+          tagsDiv.appendChild(li);
+        });
+
+        tagsDiv.classList.remove("is-hidden");
+        tagsDiv.parentNode.classList.remove("is-hidden");
+        tagsLabel.textContent = "Catégories ajoutées :";
+      }
+    } else if (data.type === "isCard") {
+      if (data.method === "edit") {
+        const { cardId } = e.target.closest(".card").dataset;
+        idInput.value = cardId;
+
+        deleteCardButton.classList.remove("is-hidden");
+
+        // Event Listener
+        deleteCardButton.addEventListener("click", (ev) =>
+          apiFetcher.deleteCardOrTodo(ev, cardId)
+        );
+      }
+    }
+
+    // TRAVAIL OUI
+
+    // const selectedTags = tagsDiv.querySelectorAll(".selected");
+    // if (selectedTags.length) {
+    //   console.log("oui");
+    // } else {
+    //   console.log("non");
+    // }
+
+
+
+
 
     // Default Events Listeners
     // On Submit
@@ -174,83 +275,45 @@ export const modalModule = {
       }
     });
 
-    // Specifics Values and Events Listeners
-    if (data.type === "isTodo") {
-      const { tags } = data;
-      const { cardId } = e.target.closest(".card").dataset;
-      idInput.value = cardId;
-
-      if (!tags) {
-        tagsDiv.parentNode.classList.add("is-hidden");
-      } else {
-        if (data.method === "add") {
-          tags.forEach((tag) => {
-            const select = clone.querySelector("select");
-            const liOption = document.createElement("option");
-            liOption.textContent = tag.name;
-
-            select.appendChild(liOption);
-          });
-
-          tagsDiv.nextSibling.nextSibling.classList.remove("is-hidden");
-          tagsDiv.parentNode.classList.remove("is-hidden");
-
-          tagsLabel.textContent =
-            modalModule.capzFirstLetter(modalModule.constants.sufixTagFr) +
-            "(s)";
-        } else if (data.method === "edit") {
-          tags.forEach((tag) => {
-            const li = document.createElement("li");
-            li.classList.add("tag--big");
-            li.style.backgroundColor = tag.color;
-            if (li.style.backgroundColor === "yellow") {
-              li.classList.toggle("tag--big-variant");
-            }
-            li.textContent = tag.name;
-
-            tagsDiv.appendChild(li);
-          });
-
-          tagsDiv.parentNode.classList.remove("is-hidden");
-          tagsLabel.textContent = "Associé au(x) catégorie(s) :";
-        }
-      }
-    } else if (data.type === "isTag") {
-      const { tags } = data;
-
-      if (!tags) {
-        tagsDiv.textContent = "Aucune catégorie trouvée.";
-      } else {
-        tags.forEach((tag) => {
-          const li = document.createElement("li");
-
-          li.classList.add("tag--big");
-          li.style.backgroundColor = tag.color;
-          if (li.style.backgroundColor === "yellow") {
-            li.classList.toggle("tag--big-variant");
-          }
-          li.textContent = tag.name;
-          tagsDiv.appendChild(li);
-        });
-
-        tagsDiv.classList.remove("is-hidden");
-        tagsDiv.parentNode.classList.remove("is-hidden");
-        tagsLabel.textContent = "Catégories ajoutées :";
-      }
-    } else if (data.type === "isCard" && data.method === "edit") {
-      const { cardId } = e.target.closest(".card").dataset;
-
-      deleteCardButton.classList.remove("is-hidden");
-
-      deleteCardButton.addEventListener("click", (ev) =>
-        apiFetcher.deleteCardOrTodo(ev, cardId)
-      );
-    }
-
     // Modal Show
     modal.classList.add("is-active");
     // Inserting the modal into the DOM
     section.parentNode.insertBefore(clone, section.nextSibling);
+  },
+
+  // To Toggle on the selected tag
+  toggleTag: function (ev, tagColor) {
+    ev.preventDefault();
+    const li = ev.target;
+
+    if (!li.classList.contains("selected")) {
+      li.classList.add("selected");
+      li.style.backgroundColor = tagColor;
+    } else {
+      li.classList.remove("selected");
+    }
+  },
+
+  // To Show the color of the queried li
+  mouseEnterTag: function (ev, tagColor) {
+    const li = ev.target;
+
+    if (!li.classList.contains("selected")) {
+      li.style.backgroundColor = tagColor;
+    } else {
+      li.style.backgroundColor = "grey";
+    }
+  },
+
+  // To Hide the color of the queried li
+  mouseLeaveTag: function (ev, tagColor) {
+    const li = ev.target;
+
+    if (li.classList.contains("selected")) {
+      li.style.backgroundColor = tagColor;
+    } else {
+      li.style.backgroundColor = "grey";
+    }
   },
 
   // To Hide all modals

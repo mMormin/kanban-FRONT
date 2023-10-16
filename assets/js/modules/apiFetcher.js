@@ -44,31 +44,37 @@ export const apiFetcher = {
         });
       });
     } catch (error) {
-      console.log(error);
+      alert("Un probléme est survenue lors de l'accés à l'API.");
     }
   },
 
+  // To Get all tags from API
   getAllTags: async function () {
     try {
       const response = await fetch(`${apiFetcher.base_url}/tags`);
       const json = await response.json();
       if (!response.ok) throw json;
-      
+
       return json;
     } catch (error) {
-      console.log(error);
+      return alert("Un probléme est survenue lors de l'accés aux catégories.");
     }
   },
 
+  // To Get all the tags associated to a card from API
   getTagsByTodo: async function (cardId, todoId) {
     try {
-      const response = await fetch(`${apiFetcher.base_url}/board/1/cards/${cardId}/todos/${todoId}/tags`);
+      if (!cardId && !todoId) throw new Error();
+
+      const response = await fetch(
+        `${apiFetcher.base_url}/boards/1/cards/${cardId}/todos/${todoId}/tags`
+      );
       const json = await response.json();
       if (!response.ok) throw json;
-      
-      return json;
+
+      return json.tags;
     } catch (error) {
-      console.log(error);
+      return alert("Un probléme est survenue lors de l'accés aux catégories.");
     }
   },
 
@@ -76,19 +82,15 @@ export const apiFetcher = {
   submitAddFormData: async function (e, dataType) {
     e.preventDefault();
 
-    const form = e.target;
-    const options = {
-      method: "POST",
-      body: formData,
-    };
-    const formData = new FormData(form);
-    const title = formData.get("title");
-
     try {
-      if (!title) {
-        alert(`Impossible de publier sans nom !`);
-        return;
-      }
+      if (!dataType) throw new Error();
+
+      const form = e.target;
+      const formData = new FormData(form);
+      const options = {
+        method: "POST",
+        body: formData,
+      };
 
       if (dataType === "isCard") {
         const response = await fetch(
@@ -110,7 +112,7 @@ export const apiFetcher = {
         const json = await response.json();
 
         todoModule.makeTodo(formData, cardId);
-      } 
+      }
       // else if (dataType === "isTag") {
       //   const response = await fetch(`${apiFetcher.base_url}/tags`, options);
       //   const json = await response.json();
@@ -119,8 +121,7 @@ export const apiFetcher = {
 
       return modalModule.hideModal();
     } catch (error) {
-      console.log(error);
-      alert("L'ajout n'est pas possible.");
+      alert("Un probléme est survenue lors de l'ajout.");
     }
   },
 
@@ -128,29 +129,23 @@ export const apiFetcher = {
   submitEditFormData: async function (e, dataType, ids) {
     e.preventDefault();
 
-    const form = e.target;
-    const formData = new FormData(form);
-    const title = formData.get("title");
-    const { cardId } = ids;
-    const options = {
-      method: "PATCH",
-      body: formData,
-    };
-
-    if (!title) {
-      alert(`Impossible de publier sans nom !`);
-      return;
-    }
-
     try {
-      if (dataType === "isCard") {
-        console.log(cardId);
+      if (!dataType && !ids) throw new Error();
 
+      const form = e.target;
+      const formData = new FormData(form);
+      const { cardId } = ids;
+      const options = {
+        method: "PATCH",
+        body: formData,
+      };
+
+      if (dataType === "isCard") {
         const cardInDom = document.querySelector(`[data-card-id="${cardId}"]`);
         const titleCard = cardInDom.querySelector("h2");
 
         const response = await fetch(
-          `${apiFetcher.base_url}/${cardId}`,
+          `${apiFetcher.base_url}/boards/1/cards/${cardId}`,
           options
         );
         const json = await response.json();
@@ -183,32 +178,32 @@ export const apiFetcher = {
 
       return modalModule.hideModal();
     } catch (error) {
-      console.log(error);
-      alert("L'édition n'est pas possible.");
+      alert("Un probléme est survenue lors de l'éditon.");
     }
   },
 
   // To Handle the deletion of a card, todo or tag
   deleteCardOrTodo: async function (e, cardId, todoId) {
     e.preventDefault();
-    const cardInDom = document.querySelector(`[data-card-id="${cardId}"]`);
-    const todoInDom = document.querySelector(`[data-todo-id="${todoId}"]`);
-
-    const options = {
-      method: "DELETE",
-    };
 
     try {
+      if (!todoId || !cardId) throw new Error();
+
+      const cardInDom = document.querySelector(`[data-card-id="${cardId}"]`);
+      const todoInDom = document.querySelector(`[data-todo-id="${todoId}"]`);
+      const options = {
+        method: "DELETE",
+      };
+
       if (!todoId) {
         cardInDom.remove();
         modalModule.hideModal();
 
         const response = await fetch(
-          `${apiFetcher.base_url}/boards/1/cards/${cardId}`,
+          `${apiFetcher.base_url}/cards/${cardId}`,
           options
         );
 
-        const json = await response.json();
         if (!response.ok) throw json;
       } else {
         todoInDom.remove();
@@ -223,8 +218,32 @@ export const apiFetcher = {
         if (!response.ok) throw json;
       }
     } catch (error) {
-      console.log(error);
-      alert("La suppression n'est pas possible.");
+      alert("Un probléme est survenue lors de la suppression.");
+    }
+  },
+
+  // To Handle the deletion of a tag
+  deleteTag: async function (e, tagId) {
+    e.preventDefault();
+
+    try {
+      if (!tagId) throw new Error();
+
+      const tagInDom = document.querySelector(`[data-card-id="${cardId}"]`);
+      const options = {
+        method: "DELETE",
+      };
+
+      modalModule.hideModal();
+
+      const response = await fetch(
+        `${apiFetcher.base_url}/cards/${cardId}`,
+        options
+      );
+
+      if (!response.ok) throw json;
+    } catch (error) {
+      alert("Un probléme est survenue lors de la suppression.");
     }
   },
 
@@ -238,10 +257,10 @@ export const apiFetcher = {
         `${apiFetcher.base_url}/boards/1/cards/${movedCardId}?swapped_card=${isMovedCardId}`,
         cardOptions
       );
-      const json = await response.json();
+
       if (!response.ok) throw json;
     } catch (error) {
-      console.log(error);
+      alert("Un probléme est survenue lors du déplacement des cartes.");
     }
   },
 
@@ -255,11 +274,10 @@ export const apiFetcher = {
         `${apiFetcher.base_url}/boards/1/cards/${cardId}/todos/${movedTodoId}?swapped_todo=${isMovedTodoId}`,
         todoOptions
       );
-      const json = await response.json();
+
       if (!response.ok) throw json;
     } catch (error) {
-      console.log(error);
-      return;
+      alert("Un probléme est survenue lors du déplacement des todos.");
     }
   },
 };

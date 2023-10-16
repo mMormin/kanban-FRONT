@@ -141,6 +141,20 @@ button.icon-button {
   color: black;
 }
 
+.tag--toggleable {
+  cursor: pointer;
+  border-radius: 0px;
+  background-color: grey;
+}
+
+.tag--toggleable:hover {
+  margin-top: -5px;
+}
+
+.tag--toggleable.selected:hover {
+  background-color: grey !important;
+}
+
 .tag {
   border-radius: 3px !important;
   height: 0.7em !important;
