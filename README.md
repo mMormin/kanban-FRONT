@@ -19,6 +19,7 @@ npm run dev
 </br>
 
 ## Works In Progress
+- Tags CRUD
 - Board
 
 </br>
@@ -29,6 +30,7 @@ npm run dev
 - [x] Drag and drop between 2Cards & 2Todos
 - [x] Todo tags
 - [x] Todo colors
+- [ ] Tags CRUD
 - [ ] Board
 - [ ] User auth (vanilla + google)
 - [ ] front + back
